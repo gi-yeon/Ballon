@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class Moving : MonoBehaviour
 {
+    void Start()
+    {
+        DontDestroyOnLoad(this.gameObject);  // 맵 이동할때 케릭터가 파괴하는걸 막는다.
+    }
+    public string currentMapName;  //j
+
     public float speed = 3f;
     public Animator animator;
     public bool isPlayerMoving = false;

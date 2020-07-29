@@ -5,13 +5,14 @@ using UnityEngine;
 public class BallScript : MonoBehaviour
 {
 
+
     private Moving thePlayer;
     private CharacterPivot thePivot;
     private Skill theSkill;
-    
+
     public float kickRadius;        //공 차는 거리
     public float kickSpeed;         //공 속도
-   
+
     private bool keyInput = true;   //공이 움직이는동안 다시 Kick이 실행되지 않도록 하기위함
 
     private Vector3 startPosition;  // 공이 움직이기 전에 위치를 기억해두었다가 이 위치로 돌아오게 해야함
@@ -29,6 +30,7 @@ public class BallScript : MonoBehaviour
     private Vector3 originalScale;
 
 
+
     // Start is called before the first frame update
     void Start()
     {
@@ -39,7 +41,7 @@ public class BallScript : MonoBehaviour
         originalScale = this.transform.localScale;
     }
 
-      
+
     // Update is called once per frame
     void Update()
     {
@@ -51,11 +53,13 @@ public class BallScript : MonoBehaviour
                 Kick();
             }
 
-            if (Input.GetKeyDown(KeyCode.Q) && theSkill.canUseSizeUp) 
+            if (theSkill.currentStageNumber >= theSkill.neededStageNumberForSkillSizeUp)
             {
-                theSkill.Skill_SizeUp();
+                if (Input.GetKeyDown(KeyCode.Q) && theSkill.canUseSizeUp)
+                {
+                    theSkill.Skill_SizeUp();
+                }
             }
-
 
         }
 
@@ -69,6 +73,7 @@ public class BallScript : MonoBehaviour
     IEnumerator KickCorouotine()
     {
 
+
         keyInput = false;       // 공이 움직이는동안에 컨트롤이 눌리지 않아야 함.
         thePivot.StopRotateBall();  //공이 움직이는 동안에 공의 각도가 변하지 않도록 해야함.
         Attack = true;      //공격 시작. OntriggerEnter2D 안의 코드들이 실행됨.
@@ -79,15 +84,18 @@ public class BallScript : MonoBehaviour
         float allTime = 0.5f;
         float elapsedTime = 0f;
 
-        while (elapsedTime < allTime) 
+        while (elapsedTime < allTime)
         {
             this.transform.localPosition = Vector3.Lerp(startPosition, targetPosition, elapsedTime / allTime);
-            elapsedTime += Time.deltaTime* kickSpeed;
+            elapsedTime += Time.deltaTime * kickSpeed;
             yield return yieldWaitTime;
         }
 
         elapsedTime = 0f;
 
+
+
+        Attack = true;
         while (elapsedTime < allTime)
         {
             this.transform.localPosition = Vector3.Lerp(targetPosition, startPosition, elapsedTime / allTime);
@@ -102,21 +110,24 @@ public class BallScript : MonoBehaviour
             startPosition = new Vector3(8, 0, 0);
         this.transform.localPosition = startPosition;
 
+
         keyInput = true;
         thePivot.CanRotateBall();
-        Attack = true;      //공격 끝. OntriggerEnter2D 안의 코드들이 실행되지 않음.
+        Attack = false;      //공격 끝. OntriggerEnter2D 안의 코드들이 실행되지 않음.
 
     }
 
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerStay2D(Collider2D collision)
     {
+
         if (Attack)
         {
-            if (collision.tag == "Enemy")
+            Attack = false;
+            if (collision.tag == "Player")      // 적의 태그에 따라 수정해야함
             {
                 Debug.Log("!");
-                // tag가 enemy인 Object를 만날 때
+                // 일정 tag를 가진 Object를 만날 때
                 // 오디오재생, 타격효과, 적체력감소 등등...
             }
         }
@@ -124,7 +135,7 @@ public class BallScript : MonoBehaviour
     }
 
 
-   
+
 
 
 }
